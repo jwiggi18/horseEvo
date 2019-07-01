@@ -1,4 +1,4 @@
-#devtools::install_github("dwbapst/paleotree", ref="developmentBranch")
+
 
 #Get taxa
 #' Return vector of taxa
