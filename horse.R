@@ -8,7 +8,7 @@
 GetTaxa <- function() {
   #data(taxa_links, package="horseEvo")
   #return(taxa_links$Genus[which(taxa_links$Genus != "All")])
-  return(c("hyracotherium", "mesohippus", "pliohippus", "equus"))
+  return(c("xenicohippus", "eohippus", "orohippus", "haplohippus", "epihippus", "miohippus","kalobatippus", "anchitherium", "hypohippus", "megahippus", "archaeohippus", "desmatippus", "parahippus", "merychippus", "nanippus", "cormohipparion", "pseudhipparion", "neohipparion", "hipparion", "protohippus", "calippus", "pliohippus", "astrohippus", "dinohippus", "equus"))
 }
 
 
@@ -31,7 +31,7 @@ GetTree <- function(taxa = GetTaxa(), rank="genus") {
 #  tree <- amb(tree)
 #plotPhylopicTreePBDB(tree = tree)
   timeTree <- paleotree::dateTaxonTreePBDB(tree)
-  return(timeTree)
+  plot(timeTree)
 }
 
 GetTree()
