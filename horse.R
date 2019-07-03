@@ -91,8 +91,9 @@ latlong_age <- function(taxa=GetTaxa(), age_df=GetAgeDF()){
 #' @export
 CreateMapList <- function(age_df=GetAgeDF(), base_url='http://gws.gplates.org/') {
   #create map list
+  maplist <- list()
   for (age_index in seq_along(age_df$MidMa)){
-    maplist <- gplatesr::land_sea(age_df$MidMa[age_index], base_url=base_url)
+    maplist[[age_index]] <- gplatesr::land_sea(age_df$MidMa[age_index], base_url=base_url)
   }
   #name maplist according to period
   names(maplist) <- age_df$Period
