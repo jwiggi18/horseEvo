@@ -103,7 +103,7 @@ CreateMapList <- function(age_df=GetAgeDF(), base_url='http://gws.gplates.org/')
 #the for loop alone works
 #for (age_index in seq_along(age_df$MidMa)){
 #  maplist <- gplatesr::land_sea(age_df$MidMa[age_index], base_url='http://gws.gplates.org/')
-}
+#}
 
 #' Make a list of maps for all times
 #'
