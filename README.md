@@ -3,22 +3,9 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of horseEvo is to ...
+The goal of horseEvo is to create an interactive website featuring the evolution of the horse over geologic time. This site will integrate information from phylotastic.org, the paleobiology database, and possibly others. 
 
 ## Installation
 
-You can install the released version of horseEvo from [CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("horseEvo")
-```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(horseEvo)
-## basic example code
-```
+horseEvo is under development, check back for a launch soon!
 
