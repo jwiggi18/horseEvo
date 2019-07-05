@@ -1,0 +1,14 @@
+Package: horseEvo
+Title: Create Horse Evolution website
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Jodie",
+           family = "Wiggins",
+           role = c("aut", "cre"),
+           email = "jodiewiggins18@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Creates an educational website for following the evolution of the horse through geologic time. 
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
