@@ -5,7 +5,7 @@ Authors@R:
     person(given = "Jodie",
            family = "Wiggins",
            role = c("aut", "cre"),
-           email = "jodiewiggins18@gmail.com",
+           email = "jodiewiggins18@gmail.com")
 Maintainer: Jodie M. Wiggins <jodiewiggins@gmail.com>
 Description: Creates an educational website for following the evolution of the horse through geologic time.
 License: What license it uses
