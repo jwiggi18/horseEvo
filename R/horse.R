@@ -208,9 +208,9 @@ AnimatePlot <- function(start_time=NULL, stop_time=NULL, periods=NULL, taxa=NULL
     }
     if(nrow(specimen_df_local)>0) {
 
-      median_start <- median(specimen_df_local$pbdb_data.min_ma, na.rm=TRUE)
-      median_stop <- median(specimen_df_local$pbdb_data.max_ma, na.rm=TRUE)
-      start_time <- median(c(0, rep(median(c(median_start, median_stop), na.rm=TRUE), 2)), na.rm=TRUE) # so that if there are no dates, it uses 0, otherwise, it uses the dates
+      median_start <- stats::median(specimen_df_local$pbdb_data.min_ma, na.rm=TRUE)
+      median_stop <- stats::median(specimen_df_local$pbdb_data.max_ma, na.rm=TRUE)
+      start_time <- stats::median(c(0, rep(stats::median(c(median_start, median_stop), na.rm=TRUE), 2)), na.rm=TRUE) # so that if there are no dates, it uses 0, otherwise, it uses the dates
       start_time <- round(start_time,0)
       stop_time <- start_time
       use_cached_maps_only <- FALSE #so we get plot of the right time
