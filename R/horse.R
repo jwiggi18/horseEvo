@@ -1,4 +1,69 @@
+#' Cache tree information
+#'
+#' @param taxa vector of taxa
+#' @export
+CacheTree <- function(taxa=GetTaxa()) {
+  chronogram <- NULL
+  try(chronogram <- GetTree(taxa=taxa))
+  if(!is.null(chronogram)) {
+    usethis::use_data(chronogram, overwrite=TRUE)
+  }
+}
 
+#' Cache phylotree tree information
+#'
+#' @param taxa vector of taxa
+#' @export
+cache_pictree <- function(tree=GetTree()) {
+  pictree <- NULL
+  try(pictree <- ctree(tree = tree))
+  if(!is.null(pictree)) {
+    usethis::use_data(pictree, overwrite=TRUE)
+  }
+}
+
+
+#' Cache map information
+#'
+#' @param age_df output of GetAgeDF()
+#' @export
+CacheMaps <- function(age_df=GetAgeDF()) {
+  paleomaps <- NULL
+  try(paleomaps <- CreateMapList(age_df))
+  if(!is.null(paleomaps)) {
+    usethis::use_data(paleomaps,   overwrite=TRUE)
+  }
+}
+
+#' Create map information all ages
+#'
+#' It used to store inside the package, but it's too huge
+#'
+#' @param base_url What URL to use for gplates
+#' @return paleomaps_allages
+#' @export
+CacheMapsAllAges <- function(base_url='http://gws.gplates.org/') {
+  paleomaps_allages <- NULL
+  try(paleomaps_allages <- CreateMapListAllTimes(base_url=base_url))
+#  if(!is.null(paleomaps_allages)) {
+#    usethis::use_data(paleomaps_allages,   overwrite=TRUE)
+#  }
+  return(paleomaps_allages)
+}
+
+#' Cache specimen information
+#'
+#' Localities of fossils from PBDB
+#
+#' @param taxa vector of taxa
+#' @export
+CacheSpecimenAges <- function(taxa=GetTaxa()) {
+  specimens <- NULL
+  try(specimens <- latlong_age(taxa))
+  if(!is.null(specimens)) {
+    usethis::use_data(specimens,   overwrite=TRUE)
+  }
+}
 
 #Get taxa
 #' Return vector of taxa
@@ -76,6 +141,51 @@ latlong_age <- function(taxa=GetTaxa(), age_df=GetAgeDF()){
           lat_long_df$Period[which(lat_long_df$pbdb_data.min_ma>=age_df$MinMa[period_index] & lat_long_df$pbdb_data.max_ma <= age_df$MaxMa[period_index])] <- age_df$Period[period_index]
         }
   return(lat_long_df)
+}
+
+
+#' Put points on a map
+#' @param taxa vector of taxon names, default is GetTaxa()
+#' @param specimen_df data.frame of specimen info
+#' @param age_df dataframe with Period, MinMa, MaxMa, MidMa, default is GetAgeDF()
+#' @param maps paleomaps list of maps (stored internally)
+#' @return a list of period maps with points for fossils from that period
+#' @export
+PutPointsOnMap <- function(taxa = GetTaxa(), specimen_df=specimens, age_df=GetAgeDF(), maps=paleomaps) {
+  specimen_df <- specimen_df[specimen_df$searched_taxon %in% taxa,] # subset of the taxa we want
+  points_maplist <- maps
+  for (map_index in seq_along(points_maplist)) {
+    chosen_period <- names(points_maplist)[map_index]
+    local_df <- specimen_df[specimen_df$Period==chosen_period,]
+    local_df$Color <- age_df$Color[age_df$Period==chosen_period]
+    if (nrow(local_df)>0) {
+      points_maplist[[map_index]] <- add_points(map=points_maplist[[map_index]], df=local_df)
+    }
+    points_maplist[[map_index]] <- points_maplist[[map_index]] + ggplot2::theme(legend.position="none")
+  }
+  return(points_maplist)
+}
+
+#' Get locations for modern species using GBIF
+#'
+#' Note that to make this work with the add_points function, needs odd output column names
+#'
+#' @param taxa vector of taxon names, default is GetTaxa()
+#' @param the rank to search at for each taxon
+#' @param fossils If TRUE, include locations of fossils
+#' @return data frame with pbdb_data.paleolng and pbdb_data.paleolat columns reflecting points from gbif
+#' @export
+GetGBIFPoints <- function(taxa = GetTaxa(), rank="genus", fossils=FALSE) {
+  location_points <- data.frame()
+  for (taxon_index in seq_along(taxa)) {
+    key <- rgbif::name_suggest(q=taxa[taxon_index], rank=rank)$key[1]
+    location_points <- plyr::rbind.fill(location_points, rgbif::occ_search(taxonKey=key, hasCoordinate=TRUE)$data)
+  }
+  if(!fossils) {
+    location_points <- location_points[location_points$basisOfRecord != "FOSSIL_SPECIMEN",]
+  }
+  final_points <- data.frame(pbdb_data.paleolng=location_points$decimalLongitude, pbdb_data.paleolat=location_points$decimalLatitude)
+  return(final_points)
 }
 
 #' Make a list of maps for all periods
