@@ -65,6 +65,83 @@ CacheSpecimenAges <- function(taxa=GetTaxa()) {
   }
 }
 
+
+#' Cache animated maps
+#'
+#' Create an array of animated maps, where the rows are taxa and the columns periods. "all" and "none" are possible taxa, and "all" is a possible period
+#' @inheritParams AnimatePlot
+#' @param MaximumAnimate If TRUE, animate everything. If false, static maps for  taxa
+#' @export
+CacheAnimatedMaps <- function(start_time=NULL, stop_time=NULL, periods=NULL, taxa=GetTaxa(), step_size=1, age_df=GetAgeDF(), specimen_df=specimens, interval=0.5, use_cached_maps_only=TRUE, use_phylopics=FALSE, point_color="red", gif_name=NULL, single_frame=FALSE, MaximumAnimate=FALSE) {
+  paleomaps_allages <-  CreateMapListAllTimes()
+  all_taxa <- c("All", "None", taxa)
+  all_periods <- c("All", age_df$Period)
+  all_periods_liststub <- vector("list",length(all_periods))
+  names(all_periods_liststub) <- all_periods
+  animatedmaps <- vector("list", length(all_taxa))
+  for (i in sequence(length(animatedmaps))) {
+    animatedmaps[[i]] <- all_periods_liststub
+  }
+  names(animatedmaps) <- all_taxa
+  #animatedmaps <- array(list(), c(2+length(taxa), 1+nrow(age_df)))
+
+  #first do all taxa, all periods
+  animatedmaps[["All"]][["All"]] <- AnimatePlot(use_phylopics=use_phylopics, interval=interval, point_color=point_color, step_size=step_size, age_df=age_df, use_cached_maps_only=use_cached_maps_only, taxa=taxa, gif_name=gsub(" ", "_", paste0("~/GitHubRepos/horseEvo/img/map_All_All.gif")), paleomaps_allages=paleomaps_allages, single_frame=single_frame)
+
+
+  #second do no taxa, all periods
+  animatedmaps[["None"]][["All"]] <- AnimatePlot(use_phylopics=use_phylopics, interval=interval, point_color=point_color, step_size=step_size, age_df=age_df, use_cached_maps_only=use_cached_maps_only, taxa=NULL, gif_name=gsub(" ", "_", paste0("~/GitHubRepos/horseEvo/img/map_None_All.gif")), paleomaps_allages=paleomaps_allages, single_frame=single_frame)
+
+  # Now for backup copy this everywhere in case they don't generate elsewhere
+  for (period_index in sequence(length(age_df$Period))) {
+      system(paste0("cp ~/GitHubRepos/horseEvo/img/map_none_All.gif ~/GitHubRepos/horseEvo/img/map_All_", age_df$Period[period_index], ".gif"))
+      system(paste0("cp ~/GitHubRepos/horseEvo/img/map_none_All.gif ~/GitHubRepos/horseEvo/img/map_None_", age_df$Period[period_index], ".gif"))
+      for (taxon_index in seq_along(taxa)) {
+        system(paste0("cp ~/GitHubRepos/horseEvo/img/map_None_All.gif ~/GitHubRepos/horseEvo/img/map_", taxa[taxon_index], "_", age_df$Period[period_index], ".gif"))
+        system(paste0("cp ~/GitHubRepos/horseEvo/img/map_None_All.gif ~/GitHubRepos/horseEvo/img/map_", taxa[taxon_index], "_All.gif"))
+      }
+  }
+
+
+  # now loop over periods, all taxa
+  for (period_index in sequence(length(age_df$Period))) {
+    print(paste("Making map for all taxa, ", age_df$Period[period_index]))
+    animatedmaps[["All"]][[period_index+1]] <- AnimatePlot(use_phylopics=use_phylopics, interval=interval, point_color=point_color, step_size=step_size, age_df=age_df, use_cached_maps_only=use_cached_maps_only, taxa=taxa, periods=age_df$Period[period_index], gif_name=gsub(" ", "_", paste0("~/GitHubRepos/horseEvo/img/map_All_", age_df$Period[period_index], ".gif")), paleomaps_allages=paleomaps_allages, single_frame=single_frame)
+  }
+
+
+  # now loop over periods, all taxa
+  for (period_index in sequence(length(age_df$Period))) {
+    print(paste("Making map for no taxa, ", age_df$Period[period_index]))
+    animatedmaps[["None"]][[period_index+1]] <- AnimatePlot(use_phylopics=use_phylopics, interval=interval, point_color=point_color, step_size=step_size, age_df=age_df, use_cached_maps_only=use_cached_maps_only, taxa=NULL, periods=age_df$Period[period_index], gif_name=gsub(" ", "_", paste0("~/GitHubRepos/horseEvo/img/map_All_", age_df$Period[period_index], ".gif")), paleomaps_allages=paleomaps_allages, single_frame=single_frame)
+  }
+
+  #third do single taxa, all periods
+
+  for (taxon_index in seq_along(taxa)) {
+    print(paste("Making map for taxon ",  taxa[taxon_index], " all periods"))
+    animatedmaps[[taxon_index+2]][["All"]] <- AnimatePlot(use_phylopics=use_phylopics, interval=interval, point_color=point_color, step_size=step_size, age_df=age_df, use_cached_maps_only=use_cached_maps_only, taxa=taxa[taxon_index], periods=NULL, gif_name=gsub(" ", "_", paste0("~/GitHubRepos/horseEvo/img/map_",taxa[taxon_index], "_All.gif")), paleomaps_allages=paleomaps_allages, single_frame=!MaximumAnimate)
+    # now loop over periods, all taxa
+    for (period_index in sequence(length(age_df$Period)-1)) {
+      print(paste("Making map for taxon ",  taxa[taxon_index], ", period ", age_df$Period[period_index]))
+      animatedmaps[[taxon_index+2]][[period_index+1]] <- AnimatePlot(use_phylopics=use_phylopics, interval=interval, point_color=point_color, step_size=step_size, age_df=age_df, use_cached_maps_only=use_cached_maps_only, taxa=taxa[taxon_index], periods=age_df$Period[period_index], gif_name=gsub(" ", "_", paste0("~/GitHubRepos/horseEvo/img/map_",taxa[taxon_index], "_", age_df$Period[period_index], ".gif")), paleomaps_allages=paleomaps_allages, single_frame=!MaximumAnimate)
+    }
+  }
+
+
+  if(!is.null(animatedmaps)) {
+    for (t_index in seq_along(all_taxa)) {
+      for (p_index in seq_along(all_periods)) {
+        #try(magick::image_write(animatedmaps[[all_taxa[t_index]]][[all_periods[p_index]]], gsub(" ", "_", paste0("/Users/bomeara/Documents/MyDocuments/GitClones/HistoryOfEarth/docs/img/map_",all_taxa[t_index], "_", all_periods[p_index], ".gif"))))
+      }
+    }
+    #usethis::use_data(animatedmaps, overwrite=TRUE)
+  }
+}
+
+
+
+
 #Get taxa
 #' Return vector of taxa
 #'
