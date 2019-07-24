@@ -139,8 +139,44 @@ CacheAnimatedMaps <- function(start_time=NULL, stop_time=NULL, periods=NULL, tax
   }
 }
 
+#Get Tree New
+#' Return a dated tree
+#'
+#' @return a dated tree
+#' @export
 
 
+GetTreeNew <- function (){
+horseTree <- ape::read.tree(file=NULL, text =
+    "(Eohippus,(Xenicohippus,(Haplohippus,(Epihippus,(Miohippus,(((Hypohippus,Megahippus),(Anchitherium,Kalobatippus)),(Archaeohippus,(Desmatippus,(Parahippus,(Merychippus,(((Hipparion_Merychippus,(Nannippus, Cormohipparion)),(Pseudhipparion,(Neohipparion, Hipparion))),(Equine_Merychippus,((Protohippus,Calippus),(Pliohippus,(Astrohippus,(Dinohippus,Equus))))))))))))))));"
+    )
+
+
+tipData <- paleotree::getSpecificTaxaPBDB(horseTree$tip.label)
+
+timeTree <- paleotree::dateTaxonTreePBDB(
+    taxaTree = horseTree,
+    taxaDataPBDB = tipData,
+    minBranchLen = 1
+    )
+
+strap::geoscalePhylo(
+    tree=timeTree,
+    ages=timeTree$ranges.used,
+     cex.tip=0.7,
+     cex.ts=0.7,
+     cex.age=0.7,
+     width=4,
+     tick.scale = 15,
+     boxes = "Epoch",
+     erotate = 90,
+     quat.rm=TRUE,
+     units=c("Period","Epoch"),
+    x.lim=c(65,-10)
+    )
+
+  plot(timetree)
+}
 
 #Get taxa
 #' Return vector of taxa
